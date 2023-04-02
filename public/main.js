@@ -8,6 +8,7 @@
 // si non ecris la valeur normale
 const OutPutPlace = document.querySelector('.outPut');
 const PreviewPlace = document.querySelector('.equation');
+const emtyForNow = document.querySelector('.emtyForNow');
 const nbrInputs = document.querySelectorAll('.inputs .nbr');
 const vergule = document.querySelector('.inputs .vergule');
 const clearBtn = document.querySelector('.inputs .clear');
@@ -27,8 +28,14 @@ class Calculatrise {
         this.symbole = symbole;
     }
     nbrClickEvent(thenbr) {
+        let change = false;
         if (PreviewPlace.classList.contains('addVergul')) {
-            this.preview += `,${thenbr}`;
+            if (thenbr == '0')
+                return;
+            this.sumByInputs += +thenbr / 10;
+            this.outPut += thenbr;
+            this.preview += (+thenbr / 10).toString();
+            change = true;
             PreviewPlace.classList.remove('addVergul');
         }
         if (PreviewPlace.classList.contains('outInEgale')) {
@@ -42,41 +49,34 @@ class Calculatrise {
             else {
                 this.sumByDefault = 0;
             }
-            this.sumByInputs = parseFloat(this.outPut);
-            console.log(`this is Defalt => ${this.sumByDefault}
-      and thi is inputs => ${this.sumByInputs}
-      and symbole => ${this.symbole}`);
+            if (PreviewEgalArrya[1] == '-') {
+                this.sumByInputs = -parseFloat(this.outPut);
+            }
+            else {
+                this.sumByInputs = parseFloat(this.outPut);
+            }
             this.preview = '= ';
         }
-        this.outPut += thenbr;
-        this.preview += thenbr;
-        this.sumByInputs = parseFloat(this.sumByInputs.toString() + thenbr);
+        if (!change) {
+            this.outPut += thenbr;
+            this.preview += thenbr;
+            this.sumByInputs = parseFloat(this.sumByInputs.toString() + thenbr);
+        }
         this.scan();
     }
-    // vergul(): void {
-    //   this.outPut += '.';
-    //   /* Start */
-    //   // if (PreviewPlace.classList.contains('outInEgale')) {
-    //   //   let PreviewEgalArrya = this.preview.trim().split('');
-    //   //   PreviewEgalArrya.shift();
-    //   //   this.outPut = PreviewEgalArrya.join('');
-    //   //   PreviewPlace.classList.remove('outInEgale');
-    //   //   if (this.symbole == 'x') {
-    //   //     this.sumByDefault = 1;
-    //   //   } else {
-    //   //     this.sumByDefault = 0;
-    //   //   }
-    //   //   this.sumByInputs = parseFloat(this.outPut);
-    //   //   console.log(`this is Defalt => ${this.sumByDefault}
-    //   //   and thi is inputs => ${this.sumByInputs}
-    //   //   and symbole => ${this.symbole}`);
-    //   // }
-    //   // end
-    //   PreviewPlace.classList.add('addVergul');
-    //   this.scan();
-    // }
+    vergul() {
+        if (PreviewPlace.classList.contains('hasVergule'))
+            return;
+        this.outPut += '.';
+        PreviewPlace.classList.add('addVergul');
+        PreviewPlace.classList.add('hasVergule');
+        this.scan();
+    }
     clear() {
+        PreviewPlace.classList.remove('addVergul');
+        PreviewPlace.classList.remove('hasVergule');
         PreviewPlace.classList.remove('outInEgale');
+        this.symbole = '';
         this.preview = '= ';
         this.outPut = '';
         this.sumByDefault = 0;
@@ -88,7 +88,14 @@ class Calculatrise {
             return;
         const theArryForchek = this.outPut.split('');
         const Lastindex = theArryForchek[theArryForchek.length - 1];
-        console.log(Lastindex);
+        if (Lastindex == '.') {
+            theArryForchek.pop();
+            this.outPut = theArryForchek.join('');
+            this.scan();
+            PreviewPlace.classList.remove('hasVergule');
+            PreviewPlace.classList.remove('addVergul');
+            return;
+        }
         if (Lastindex == '+' ||
             Lastindex == '-' ||
             Lastindex == '/' ||
@@ -127,6 +134,13 @@ class Calculatrise {
                     this.sumByDefault = 0;
                 }
             }
+        }
+        let NewtheArryForchek = this.outPut.split('');
+        let NewLastindex = NewtheArryForchek[NewtheArryForchek.length - 1];
+        if (NewLastindex == '.') {
+            NewtheArryForchek.pop();
+            this.outPut = NewtheArryForchek.join('');
+            PreviewPlace.classList.remove('hasVergule');
         }
         this.scan();
     }
@@ -181,10 +195,25 @@ class Calculatrise {
                 throw new Error('the Symbole Is not here');
             }
         }
-        PreviewPlace.textContent = this.preview;
+        if (this.preview.length > 12) {
+            let theArrychange = this.preview.trim().split('');
+            theArrychange.shift();
+            theArrychange.length = 12;
+            this.preview = theArrychange.join('');
+        }
+        if (this.preview === '= NaN') {
+            window.location.reload();
+            return;
+        }
+        if (this.preview !== '= Infinity') {
+            PreviewPlace.textContent = this.preview;
+        }
         OutPutPlace.textContent = this.outPut;
     }
     chekSymbole(symboleEntry) {
+        if (PreviewPlace.classList.contains('hasVergule')) {
+            PreviewPlace.classList.remove('hasVergule');
+        }
         if (PreviewPlace.classList.contains('outInEgale')) {
             let PreviewEgalArrya = this.preview.trim().split('');
             PreviewEgalArrya.shift();
@@ -262,6 +291,13 @@ devesion.addEventListener('click', () => {
 equals.addEventListener('click', () => {
     Calculatrise.myCalc.equals();
 });
-// vergule.addEventListener('click', () => {
-//   Calculatrise.myCalc.vergul();
-// });
+vergule.addEventListener('click', () => {
+    Calculatrise.myCalc.vergul();
+});
+emtyForNow.addEventListener('click', () => {
+    const popUp = document.querySelector('.pop-up');
+    popUp.classList.add('pop');
+    setTimeout(() => {
+        popUp.classList.remove('pop');
+    }, 2000);
+});

@@ -83,3 +83,27 @@ body {
   color: white;
   font-size: 50px;
 }
+
+.pop-up {
+  color: white;
+  background-color: black;
+  position: absolute;
+  top: 30px;
+  padding: 6px 15px;
+  font-size: 20px;
+  text-transform: lowercase;
+  letter-spacing: 1.1px;
+  border: 2px solid red;
+  border-radius: 42px;
+  display: flex;
+  align-items: center;
+  line-height: 38px;
+  transition: 0.3s;
+  opacity: 0;
+  user-select: none;
+  pointer-events: none;
+
+}
+.pop {
+  opacity: 1;
+}
